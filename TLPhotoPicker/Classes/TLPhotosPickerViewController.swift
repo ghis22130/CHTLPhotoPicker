@@ -84,6 +84,13 @@ public struct TLPhotosPickerConfigure {
     public var fetchOption: PHFetchOptions? = nil
     public var fetchCollectionOption: [FetchCollectionType: PHFetchOptions] = [:]
     public var selectedColor = UIColor(red: 88/255, green: 144/255, blue: 255/255, alpha: 1.0)
+    public var selectedBorderWidth: CGFloat = 10
+    public var selectedCornerRadius: CGFloat = 0
+    public var orderBgHeight: CGFloat = 30
+    public var orderBgCornerRadius: CGFloat = 2
+    public var orderBgTopInset: CGFloat = 0
+    public var orderBgRightInset: CGFloat = 0
+  
     public var cameraBgColor = UIColor(red: 221/255, green: 223/255, blue: 226/255, alpha: 1)
     public var cameraIcon = TLBundle.podBundleImage(named: "camera")
     public var videoIcon = TLBundle.podBundleImage(named: "video")

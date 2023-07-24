@@ -43,7 +43,11 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
     @IBOutlet open var selectedHeight: NSLayoutConstraint?
     @IBOutlet open var orderLabel: UILabel?
     @IBOutlet open var orderBgView: UIView?
-    
+    @IBOutlet open var orderBgHeight: NSLayoutConstraint?
+    @IBOutlet open var orderBgWidth: NSLayoutConstraint?
+    @IBOutlet open var orderBgTopInset: NSLayoutConstraint?
+    @IBOutlet open var orderBgRightInset: NSLayoutConstraint?
+  
     var configure = TLPhotosPickerConfigure() {
         didSet {
             self.selectedView?.layer.borderColor = self.configure.selectedColor.cgColor
@@ -51,9 +55,16 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
             self.videoIconImageView?.image = self.configure.videoIcon
             self.orderBgView?.isHidden = self.configure.singleSelectedMode
             self.orderLabel?.isHidden = self.configure.singleSelectedMode
+            self.selectedView?.layer.borderWidth = self.configure.selectedBorderWidth + 5
+            self.selectedView?.layer.cornerRadius = self.configure.selectedCornerRadius
+            self.orderBgView?.layer.cornerRadius = self.configure.orderBgCornerRadius
+            self.orderBgHeight?.constant = self.configure.orderBgHeight
+            self.orderBgWidth?.constant = self.configure.orderBgHeight
+            self.orderBgTopInset?.constant = self.configure.orderBgTopInset + 5
+            self.orderBgRightInset?.constant = self.configure.orderBgRightInset + 5
         }
     }
-    
+
     open internal(set) var asset: PHAsset?
     
     @objc open var isCameraCell = false
