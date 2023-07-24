@@ -1290,7 +1290,6 @@ extension TLPhotosPickerViewController {
         
         if let index = selectedAssets.firstIndex(where: { $0.phAsset == asset.phAsset }) {
         //deselect
-            logDelegate?.deselectedPhoto(picker: self, at: indexPath.row)
             selectedAssets.remove(at: index)
             #if swift(>=4.1)
             selectedAssets = selectedAssets.enumerated().compactMap({ (offset,asset) -> TLPHAsset? in
@@ -1311,10 +1310,14 @@ extension TLPhotosPickerViewController {
             if playRequestID?.indexPath == indexPath {
                 stopPlay()
             }
+            
+            logDelegate?.deselectedPhoto(picker: self, at: indexPath.row)
         } else {
         //select
-            logDelegate?.selectedPhoto(picker: self, at: indexPath.row)
-            guard !maxCheck(), canSelect(phAsset: phAsset) else { return }
+            guard !maxCheck(), canSelect(phAsset: phAsset) else {
+              logDelegate?.selectedPhoto(picker: self, at: indexPath.row)
+              return
+            }
             
             asset.selectedOrder = selectedAssets.count + 1
             selectedAssets.append(asset)
@@ -1324,6 +1327,8 @@ extension TLPhotosPickerViewController {
             if asset.type != .photo, configure.autoPlay {
                 playVideo(asset: asset, indexPath: indexPath)
             }
+            
+            logDelegate?.selectedPhoto(picker: self, at: indexPath.row)
         }
 
     }
