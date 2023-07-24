@@ -7,7 +7,7 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'TLPhotoPicker'
+  s.name             = 'CHTLPhotoPicker'
   s.version          = '2.1.6'
   s.summary          = 'multiple phassets picker for iOS lib. like facebook'
 
