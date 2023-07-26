@@ -96,7 +96,9 @@ public struct TLPhotosPickerConfigure {
     public var videoIcon = TLBundle.podBundleImage(named: "video")
     public var placeholderIcon = TLBundle.podBundleImage(named: "insertPhotoMaterial")
     public var nibSet: (nibName: String, bundle:Bundle)? = nil
+    public var customCell: (cellClass: AnyClass, forCellWithReuseIdentifier: String)? = nil
     public var cameraCellNibSet: (nibName: String, bundle:Bundle)? = nil
+    public var customCameraCell: (cellClass: AnyClass, forCellWithReuseIdentifier: String)? = nil
     public var fetchCollectionTypes: [(PHAssetCollectionType,PHAssetCollectionSubtype)]? = nil
     public var groupByFetch: PHFetchedResultGroupedBy? = nil
     public var supportedInterfaceOrientations: UIInterfaceOrientationMask = .portrait
@@ -383,7 +385,11 @@ extension TLPhotosPickerViewController {
     @objc public func registerNib(nibName: String, bundle: Bundle) {
         self.collectionView.register(UINib(nibName: nibName, bundle: bundle), forCellWithReuseIdentifier: nibName)
     }
-    
+  
+    public func register(_ cellClass: AnyClass, forCellWithReuseIdentifier: String) {
+        self.collectionView.register(cellClass, forCellWithReuseIdentifier: forCellWithReuseIdentifier)
+    }
+      
     private func centerAtRect(image: UIImage?, rect: CGRect, bgColor: UIColor = UIColor.white) -> UIImage? {
         guard let image = image else { return nil }
         UIGraphicsBeginImageContextWithOptions(rect.size, false, image.scale)
@@ -417,6 +423,12 @@ extension TLPhotosPickerViewController {
         }
         if let nibSet = self.configure.cameraCellNibSet {
             registerNib(nibName: nibSet.nibName, bundle: nibSet.bundle)
+        }
+        if let customCell = self.configure.customCell {
+            register(customCell.cellClass, forCellWithReuseIdentifier: customCell.forCellWithReuseIdentifier)
+        }
+        if let customCameraCell = self.configure.customCameraCell {
+            register(customCameraCell.cellClass, forCellWithReuseIdentifier: customCameraCell.forCellWithReuseIdentifier)
         }
         self.indicator.startAnimating()
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(titleTap))
@@ -998,21 +1010,30 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
     
     //Datasource
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        func makeCell(nibName: String) -> TLPhotoCollectionViewCell {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nibName, for: indexPath) as! TLPhotoCollectionViewCell
+        func makeCell(name: String) -> TLPhotoCollectionViewCell {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: name, for: indexPath) as! TLPhotoCollectionViewCell
             cell.configure = self.configure
             cell.imageView?.image = self.placeholderThumbnail
             cell.liveBadgeImageView?.image = nil
             return cell
         }
-        let nibName = self.configure.nibSet?.nibName ?? "TLPhotoCollectionViewCell"
-        var cell = makeCell(nibName: nibName)
+      
+        var cell: TLPhotoCollectionViewCell
+        if let customCell = self.configure.customCell {
+          cell = makeCell(name: customCell.forCellWithReuseIdentifier)
+        } else {
+          let nibName = self.configure.nibSet?.nibName ?? "TLPhotoCollectionViewCell"
+          cell = makeCell(name: nibName)
+        }
+        
         guard let collection = self.focusedCollection else { return cell }
         cell.isCameraCell = collection.useCameraButton && indexPath.section == 0 && indexPath.row == 0
         if cell.isCameraCell {
-            if let nibName = self.configure.cameraCellNibSet?.nibName {
-                cell = makeCell(nibName: nibName)
-            }else{
+            if let customCameraCell = self.configure.customCameraCell {
+                cell = makeCell(name: customCameraCell.forCellWithReuseIdentifier)
+            } else if let nibName = self.configure.cameraCellNibSet?.nibName {
+                cell = makeCell(name: nibName)
+            } else {
                 cell.imageView?.image = self.cameraImage
             }
             return cell
