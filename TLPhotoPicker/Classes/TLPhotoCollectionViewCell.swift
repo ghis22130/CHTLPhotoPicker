@@ -68,6 +68,10 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
     open internal(set) var asset: PHAsset?
     
     @objc open var isCameraCell = false
+  
+    open var didTapBadgeArea: (() -> Void)?
+  
+    open var didTapImageArea: (() -> Void)?
     
     open var duration: TimeInterval? {
         didSet {
@@ -185,6 +189,8 @@ open class TLPhotoCollectionViewCell: UICollectionViewCell {
     override open func prepareForReuse() {
         super.prepareForReuse()
         stopPlay()
+        self.didTapBadgeArea = nil
+        self.didTapImageArea = nil
         self.durationView?.isHidden = true
         self.durationView?.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.6)
         self.selectedHeight?.constant = 10
