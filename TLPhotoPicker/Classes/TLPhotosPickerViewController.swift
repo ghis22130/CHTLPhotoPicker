@@ -190,6 +190,10 @@ open class TLPhotosPickerViewController: UIViewController {
             self.configure.allowedLivePhotos = newValue
         }
     }
+    
+    // channel custom
+    open var didTapImageAreaOnCell: ((PHFetchResult<PHAsset>, Int) -> Void)? = nil
+  
     @objc open var canSelectAsset: ((PHAsset) -> Bool)? = nil
     @objc open var didExceedMaximumNumberOfSelection: ((TLPhotosPickerViewController) -> Void)? = nil
     @objc open var handleNoAlbumPermissions: ((TLPhotosPickerViewController) -> Void)? = nil
@@ -1041,6 +1045,20 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
         guard let asset = collection.getTLAsset(at: indexPath) else { return cell }
         
         cell.asset = asset.phAsset
+      
+        // channel custom
+        cell.didTapBadgeArea = { [weak self] in
+          guard let collection = self?.focusedCollection, let cell = self?.collectionView.cellForItem(at: indexPath) as? TLPhotoCollectionViewCell else { return }
+          
+          self?.toggleSelection(for: cell, at: indexPath)
+        }
+      
+        // channel custom
+        cell.didTapImageArea = { [weak self] in
+          guard let currentFetchResult = self?.focusedCollection?.fetchResult else { return }
+          
+          self?.didTapImageAreaOnCell?(currentFetchResult, indexPath.item - 1)
+        }
         
         if let selectedAsset = getSelectedAssets(asset) {
             cell.selectedAsset = true
