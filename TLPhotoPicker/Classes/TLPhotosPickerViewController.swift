@@ -20,6 +20,7 @@ public protocol TLPhotosPickerViewControllerDelegate: AnyObject {
     func canSelectAsset(phAsset: PHAsset) -> Bool
     func didExceedMaximumNumberOfSelection(picker: TLPhotosPickerViewController)
     func handleNoAlbumPermissions(picker: TLPhotosPickerViewController)
+    func handleLimitAlbumPermissions(picker: TLPhotosPickerViewController)
     func handleNoCameraPermissions(picker: TLPhotosPickerViewController)
 }
 
@@ -33,6 +34,7 @@ extension TLPhotosPickerViewControllerDelegate {
     public func canSelectAsset(phAsset: PHAsset) -> Bool { return true }
     public func didExceedMaximumNumberOfSelection(picker: TLPhotosPickerViewController) { }
     public func handleNoAlbumPermissions(picker: TLPhotosPickerViewController) { }
+    public func handleLimitAlbumPermissions(picer: TLPhotosPickerViewController) { }
     public func handleNoCameraPermissions(picker: TLPhotosPickerViewController) { }
 }
 
@@ -289,6 +291,7 @@ open class TLPhotosPickerViewController: UIViewController {
             requestAuthorization()
         case .limited:
             loadPhotos(limitMode: true)
+            handleLimitedAlbumsAuthorization()
         case .authorized:
             loadPhotos(limitMode: false)
         case .restricted, .denied:
@@ -694,6 +697,12 @@ extension TLPhotosPickerViewController: UIImagePickerControllerDelegate, UINavig
         }
         
         self.present(picker, animated: true, completion: nil)
+    }
+  
+    private func handleLimitedAlbumsAuthorization() {
+        DispatchQueue.main.async {
+          self.delegate?.handleLimitAlbumPermissions(picker: self)
+        }
     }
 
     private func handleDeniedAlbumsAuthorization() {
