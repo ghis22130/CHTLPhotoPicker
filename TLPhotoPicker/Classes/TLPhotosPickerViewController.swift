@@ -196,7 +196,11 @@ open class TLPhotosPickerViewController: UIViewController {
     
     // channel custom
     open var didTapImageAreaOnCell: ((PHFetchResult<PHAsset>, Int) -> Void)? = nil
-  
+    open var assetCountOfFocusedCollection: Int {
+        return self.focusedCollection?.fetchResult?.count ?? 0
+    }
+    //
+    
     @objc open var canSelectAsset: ((PHAsset) -> Bool)? = nil
     @objc open var didExceedMaximumNumberOfSelection: ((TLPhotosPickerViewController) -> Void)? = nil
     @objc open var handleNoAlbumPermissions: ((TLPhotosPickerViewController) -> Void)? = nil
