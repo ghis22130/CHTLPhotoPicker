@@ -102,6 +102,7 @@ public struct TLPhotosPickerConfigure {
     public var customCell: (cellClass: AnyClass, forCellWithReuseIdentifier: String)? = nil
     public var cameraCellNibSet: (nibName: String, bundle:Bundle)? = nil
     public var customCameraCell: (cellClass: AnyClass, forCellWithReuseIdentifier: String)? = nil
+    public var customBgColor: UIColor = UIColor.defaultBackgroundColor
     public var fetchCollectionTypes: [(PHAssetCollectionType,PHAssetCollectionSubtype)]? = nil
     public var groupByFetch: PHFetchedResultGroupedBy? = nil
     public var supportedInterfaceOrientations: UIInterfaceOrientationMask = .portrait
@@ -260,22 +261,21 @@ open class TLPhotosPickerViewController: UIViewController {
     }
     
     private func updateUserInterfaceStyle() {
-        if #available(iOS 13.0, *) {
+        let image = TLBundle.podBundleImage(named: "pop_arrow")
+        let subImage = TLBundle.podBundleImage(named: "arrow")
+
+        if #available(iOS 12.0, *) {
             let userInterfaceStyle = self.traitCollection.userInterfaceStyle
-            let image = TLBundle.podBundleImage(named: "pop_arrow")
-            let subImage = TLBundle.podBundleImage(named: "arrow")
             if userInterfaceStyle.rawValue == 2 {
-                self.popArrowImageView.image = image?.colorMask(color: .systemBackground)
                 self.subTitleArrowImageView.image = subImage?.colorMask(color: .white)
-                self.view.backgroundColor = .black
-                self.collectionView.backgroundColor = .black
             } else {
-                self.popArrowImageView.image = image?.colorMask(color: .white)
                 self.subTitleArrowImageView.image = subImage
-                self.view.backgroundColor = .white
-                self.collectionView.backgroundColor = .white
             }
         }
+    
+        self.popArrowImageView.image = image?.colorMask(color: self.configure.customBgColor)
+        self.view.backgroundColor = self.configure.customBgColor
+        self.collectionView.backgroundColor = self.configure.customBgColor
     }
     
     override open func didReceiveMemoryWarning() {
@@ -1265,6 +1265,7 @@ extension TLPhotosPickerViewController: UITableViewDelegate, UITableViewDataSour
         let collection = self.collections[indexPath.row]
         cell.titleLabel.text = collection.title
         cell.subTitleLabel.text = "\(collection.fetchResult?.count ?? 0)"
+        cell.bgColor = self.configure.customBgColor
         if let phAsset = collection.getAsset(at: collection.useCameraButton ? 1 : 0) {
             let scale = UIScreen.main.scale
             let size = CGSize(width: 80*scale, height: 80*scale)
@@ -1420,5 +1421,17 @@ extension UIImage {
         }
         UIGraphicsEndImageContext()
         return result ?? self
+    }
+}
+
+extension UIColor {
+    public static var defaultBackgroundColor: UIColor {
+        if #available(iOS 13.0, *) {
+            return .systemBackground
+        } else if #available(iOS 12.0, *)  {
+            return UIScreen.main.traitCollection.userInterfaceStyle == .light ? .white: .black
+        } else {
+            return .white
+        }
     }
 }
