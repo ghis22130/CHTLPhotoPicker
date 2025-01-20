@@ -12,14 +12,20 @@ open class TLCollectionTableViewCell: UITableViewCell {
     @IBOutlet open var thumbImageView: UIImageView!
     @IBOutlet open var titleLabel: UILabel!
     @IBOutlet open var subTitleLabel: UILabel!
+    open var bgColor: UIColor = .defaultBackgroundColor {
+        didSet {
+            self.backgroundColor = self.bgColor
+            self.contentView.backgroundColor = self.bgColor
+        }
+    }
     
     override open func awakeFromNib() {
         super.awakeFromNib()   
         if #available(iOS 11.0, *) {
             self.thumbImageView.accessibilityIgnoresInvertColors = true
         }
-        if #available(iOS 13.0, *) {
-            self.contentView.backgroundColor = .systemBackground
-        }
+        
+        self.backgroundColor = self.bgColor
+        self.contentView.backgroundColor = self.bgColor
     }
 }
