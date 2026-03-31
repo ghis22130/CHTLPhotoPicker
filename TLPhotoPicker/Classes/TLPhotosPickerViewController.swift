@@ -718,10 +718,10 @@ extension TLPhotosPickerViewController {
         let minRow = min(startIndexPath.row, endIndexPath.row)
         let maxRow = max(startIndexPath.row, endIndexPath.row)
         let currentRange = Set(minRow...maxRow)
+        let itemCount = collection.sections?[safe: endIndexPath.section]?.assets.count ?? collection.count
         let toProcess = processedIndexPaths.subtracting(currentRange)
         for row in toProcess {
             let indexPath = IndexPath(row: row, section: endIndexPath.section)
-            let itemCount = collection.sections?[safe: indexPath.section]?.assets.count ?? collection.count
             guard row < itemCount else { continue }
             if isCameraIndexPath(indexPath, in: collection) { continue }
 
@@ -740,7 +740,6 @@ extension TLPhotosPickerViewController {
 
             if processedIndexPaths.contains(row) { continue }
 
-            let itemCount = collection.sections?[safe: indexPath.section]?.assets.count ?? collection.count
             guard row < itemCount else { continue }
             if isCameraIndexPath(indexPath, in: collection) { continue }
 
@@ -1141,9 +1140,7 @@ extension TLPhotosPickerViewController: UICollectionViewDelegate,UICollectionVie
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let collection = self.focusedCollection, let cell = self.collectionView.cellForItem(at: indexPath) as? TLPhotoCollectionViewCell else { return }
         
-        let isCameraRow = collection.useCameraButton && indexPath.section == 0 && indexPath.row == 0
-        
-        if isCameraRow {
+        if isCameraIndexPath(indexPath, in: collection) {
             selectCameraCell(cell)
             return
         }
